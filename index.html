@@ -5,59 +5,106 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tebak Angka</title>
 <style>
-  body {
+   body {
     font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
+    background-color: #f3f3f3;
+    margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    margin: 0;
   }
   .container {
-    background-color: #fff;
+    background-color: #ffffff;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
     text-align: center;
   }
   h1 {
-    color: #333;
+    color: #333333;
+    margin-top: 0;
+  }
+  p {
+    color: #666666;
+    margin-bottom: 15px;
+  }
+  input[type="number"] {
+    padding: 10px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
   }
   button {
     background-color: #007bff;
-    color: #fff;
+    color: #ffffff;
     border: none;
     border-radius: 5px;
     padding: 10px 20px;
     cursor: pointer;
   }
   button:hover {
-    background-color: #b30000;
+    background-color: #0056b3;
+  }
+  .credit {
+    margin-top: 20px;
+    font-size: 12px;
+    color: #888888;
+  }
+  .credit a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  .animate-bounce {
+    animation: bounce 0.5s infinite alternate;
+  }
+  @keyframes bounce {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-10px);
+    }
   }
 
-
+   .highscore {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333333;
+  }
 </style>
 </head>
 <body>
+    <audio id="winSound">
+        <source src="win_sound.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
    <div class="container">
-    <h1>Tebak Angka</h1>
-    <p>Adam telah memilih angka antara 1 sampai 100. Cobalah menebaknya!</p>
+    <h1>Permainan Tebak Angka</h1>
+    <p>Adam telah memilih angka antara 1 dan 100. Cobalah menebaknya!</p>
     <input type="number" id="tebakan" min="1" max="100">
     <button onclick="cekTebakan()">Cek Tebakan</button>
     <p id="hasil"></p>
-    <button onclick="mainUlang()">Main Ulang</button>
+    <button id="mainUlang" onclick="mainUlang()" style="display: none;">Main Ulang</button>
+    <p class="highscore">Skor Tertinggi: <span id="skorTertinggi">0</span></p>
+    <p class="time">Waktu Tersisa: <span id="waktuTersisa">30</span> detik</p>
   </div>
   <script>
-   let angkaRandom;
+    let angkaRandom;
     let jumlahTebakan = 0;
+    let skorTertinggi = localStorage.getItem("skorTertinggi") || 0;
+    let waktuTersisa = 30;
+    let interval;
 
     function mulaiPermainan() {
       angkaRandom = Math.floor(Math.random() * 100) + 1;
       jumlahTebakan = 0;
+      waktuTersisa = 30;
       document.getElementById('hasil').innerHTML = '';
       document.getElementById('tebakan').value = '';
       document.getElementById('mainUlang').style.display = 'none';
+      document.getElementById('waktuTersisa').textContent = waktuTersisa;
+      clearInterval(interval);
+      interval = setInterval(updateWaktu, 1000);
     }
 
     function cekTebakan() {
@@ -65,8 +112,20 @@
       jumlahTebakan++;
 
       if (tebakan === angkaRandom) {
+        clearInterval(interval);
         document.getElementById('hasil').innerHTML = `Selamat! Anda menebak dengan benar setelah ${jumlahTebakan} tebakan.`;
         document.getElementById('mainUlang').style.display = 'block';
+        document.getElementById('hasil').classList.add('animate-bounce');
+
+        // Membandingkan skor tertinggi
+        if (jumlahTebakan < skorTertinggi || skorTertinggi === 0) {
+          skorTertinggi = jumlahTebakan;
+          localStorage.setItem("skorTertinggi", skorTertinggi);
+          document.getElementById('skorTertinggi').textContent = skorTertinggi;
+        }
+
+        // Memainkan efek suara
+        playWinSound();
       } else if (tebakan < angkaRandom) {
         document.getElementById('hasil').innerHTML = 'Tebakan terlalu rendah. Coba lagi.';
       } else {
@@ -74,13 +133,30 @@
       }
     }
 
+    function playWinSound() {
+      const winSound = document.getElementById('winSound');
+      winSound.play();
+    }
+
     function mainUlang() {
       mulaiPermainan();
+    }
+
+    function updateWaktu() {
+      waktuTersisa--;
+      document.getElementById('waktuTersisa').textContent = waktuTersisa;
+      if (waktuTersisa <= 0) {
+        clearInterval(interval);
+        document.getElementById('tebakan').disabled = true;
+        document.getElementById('hasil').innerHTML = 'Waktu Habis!';
+        document.getElementById('mainUlang').style.display = 'block';
+      }
     }
 
     // Memulai permainan saat halaman dimuat
     window.onload = function () {
       mulaiPermainan();
+      document.getElementById('skorTertinggi').textContent = skorTertinggi;
     };
   </script>
 </body>
