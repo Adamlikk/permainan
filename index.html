@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tebak Angka</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .container {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+  }
+  h1 {
+    color: #333;
+  }
+  button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #b30000;
+  }
+
+
+</style>
+</head>
+<body>
+   <div class="container">
+    <h1>Tebak Angka</h1>
+    <p>Adam telah memilih angka antara 1 dan 100. Cobalah menebaknya!</p>
+    <input type="number" id="tebakan" min="1" max="100">
+    <button onclick="cekTebakan()">Cek Tebakan</button>
+    <p id="hasil"></p>
+    <button onclick="mainUlang()">Main Ulang</button>
+  </div>
+  <script>
+   let angkaRandom;
+    let jumlahTebakan = 0;
+
+    function mulaiPermainan() {
+      angkaRandom = Math.floor(Math.random() * 100) + 1;
+      jumlahTebakan = 0;
+      document.getElementById('hasil').innerHTML = '';
+      document.getElementById('tebakan').value = '';
+      document.getElementById('mainUlang').style.display = 'none';
+    }
+
+    function cekTebakan() {
+      const tebakan = parseInt(document.getElementById('tebakan').value);
+      jumlahTebakan++;
+
+      if (tebakan === angkaRandom) {
+        document.getElementById('hasil').innerHTML = `Selamat! Anda menebak dengan benar setelah ${jumlahTebakan} tebakan.`;
+        document.getElementById('mainUlang').style.display = 'block';
+      } else if (tebakan < angkaRandom) {
+        document.getElementById('hasil').innerHTML = 'Tebakan terlalu rendah. Coba lagi.';
+      } else {
+        document.getElementById('hasil').innerHTML = 'Tebakan terlalu tinggi. Coba lagi.';
+      }
+    }
+
+    function mainUlang() {
+      mulaiPermainan();
+    }
+
+    // Memulai permainan saat halaman dimuat
+    window.onload = function () {
+      mulaiPermainan();
+    };
+  </script>
+</body>
+</html>
